@@ -61,8 +61,8 @@ jobs:
     #    uses a compiled language
     - if: matrix.language == 'csharp'
       run: | 
-        make bootstrap
-        make release
+        makefile bootstrap
+        makefile release
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
