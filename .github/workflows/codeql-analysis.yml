@@ -60,8 +60,9 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
     - if: matrix.language == 'csharp'
-      run: | 
-        name csharp
+      name: Build C# Code
+      id: build_csharp_code
+      uses: github/codeql-action/autobuild@v1
         
 
     - name: Perform CodeQL Analysis
