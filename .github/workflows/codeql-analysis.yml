@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'C#' ]
+        language: [ 'csharp' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
         # Learn more about CodeQL language support at https://git.io/codeql-language-support
 
@@ -61,8 +61,7 @@ jobs:
     #    uses a compiled language
     - if: matrix.language == 'csharp'
       run: | 
-        make bootstrap
-        make release
+        
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
