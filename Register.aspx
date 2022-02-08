@@ -4,14 +4,15 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title></title>
+    <title>Sign up an account</title>
 </head>
 <body>
     <h1>Register an acocunt</h1>
     <br />
     <form id="login_form" runat="server">
         <div>
-            
+            <asp:Label runat="server" ID="err_msg" ForeColor="Red"></asp:Label>
+
             <asp:Table ID="Table1" runat="server">
 
                 <asp:TableRow>
@@ -56,7 +57,7 @@
                         <asp:Label ID="lbl_dob" runat="server" Text="Date Of Birth"></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="tb_dob" runat="server"></asp:TextBox>
+                        <asp:TextBox type="date" ID="tb_dob" runat="server"></asp:TextBox>
                         <br style="padding-bottom:20px;" />
                     </asp:TableCell>
                 </asp:TableRow>
@@ -66,7 +67,7 @@
                         <asp:Label ID="lbl_password" runat="server" Text="Password"></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="tb_password" runat="server" onkeyup="javascript:CheckPassword()"></asp:TextBox>
+                        <asp:TextBox type="password" ID="tb_password" runat="server" onkeyup="javascript:CheckPassword()"></asp:TextBox>
                         <br />
                         <asp:Label ID="lbl_passwordRequirement" runat="server" ForeColor="Red" Font-Size="10px"></asp:Label>
                         <br />
@@ -91,7 +92,7 @@
                         <asp:Label ID="lbl_expireDate" runat="server" Text="Expiration Date"></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="tb_expireDate" runat="server"></asp:TextBox>
+                        <asp:TextBox type="date" ID="tb_expireDate" runat="server"></asp:TextBox>
                     </asp:TableCell>
                 </asp:TableRow>
                 <asp:TableRow>
@@ -107,7 +108,7 @@
 
                 </asp:TableRow>
             </asp:Table>
-            
+
             <asp:Button ID="btn_submit" runat="server" Text="Register" OnClick="btn_submit_Click" />
         </div>
     </form>

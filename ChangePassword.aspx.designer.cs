@@ -11,7 +11,7 @@ namespace Assignment
 {
 
 
-    public partial class Lockout
+    public partial class ChangePassword
     {
 
         /// <summary>
@@ -24,6 +24,24 @@ namespace Assignment
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
 
         /// <summary>
+        /// tb_oldPassword control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tb_oldPassword;
+
+        /// <summary>
+        /// tb_newPassword control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tb_newPassword;
+
+        /// <summary>
         /// lbl_errorMsg control.
         /// </summary>
         /// <remarks>
@@ -31,14 +49,5 @@ namespace Assignment
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lbl_errorMsg;
-
-        /// <summary>
-        /// btn_Unlock control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btn_Unlock;
     }
 }
