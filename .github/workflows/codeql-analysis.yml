@@ -61,6 +61,7 @@ jobs:
     #    uses a compiled language
     - if: matrix.language == 'csharp'
       run: | 
+        name csharp
         
 
     - name: Perform CodeQL Analysis
