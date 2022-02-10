@@ -35,9 +35,11 @@ namespace Assignment
         protected void btn_submit_Click(object sender, EventArgs e)
         {
             InputXSSValidation();
-            CheckStrongPassword();
-            HashPassword();
-            CreateAccount();
+            if (CheckRegex()) 
+            {
+                HashPassword();
+                CreateAccount();
+            }
         }
 
         protected void CreateAccount()
@@ -94,7 +96,7 @@ namespace Assignment
             }
             catch (SqlException)
             {
-                err_msg.Text = "Invalid input field entered. Please do not use dangerous characters and naming e.g. <, >";
+                err_msg.Text = "Invalid input field entered, or an existing user already exists";
             }
             catch (Exception ex)
             {
@@ -102,20 +104,46 @@ namespace Assignment
             }
         }
 
-        private void CheckStrongPassword()
+        private bool CheckRegex()
         {
-            bool valid = false;
-            if (password.Length >= 12)
+            bool valid = true;
+            if (password.Length < 12)
             {
-                if (Regex.IsMatch(password, "[a-z]") && Regex.IsMatch(password, "[A-Z]") && Regex.IsMatch(password, "[0-9]") &&
-                Regex.IsMatch(password, "[^a-zA-Z0-9]"))
+                if (!(Regex.IsMatch(password, "[a-z]") && Regex.IsMatch(password, "[A-Z]") && Regex.IsMatch(password, "[0-9]") &&
+                Regex.IsMatch(password, "[^a-zA-Z0-9]")) )
                 {
-                    valid = true;
+                    valid = false;
                 }
             }
 
             if (!valid)
                 err_password.Text = "Password must contain minimum 12 characters, combination of lower-case, upper-case, numbers and special characters";
+
+            if (!Regex.IsMatch(fname, "^[a-zA-Z0-9]{1,}$"))
+            {
+                err_fname.Text = "First name must not contain special characters";
+                valid = false;
+            }
+
+            if (!Regex.IsMatch(lname, "^[a-zA-Z0-9]{1,}$"))
+            {
+                err_lname.Text = "Last name must not contain special characters";
+                valid = false;
+            }
+
+            if (!Regex.IsMatch(email, "/^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$/"))
+            {
+                err_email.Text = "Email must be in the correct format - example@example.somthing";
+                valid = false;
+            }   
+
+            if (!Regex.IsMatch(creditCVV, "^[0-9]{3, 4}$"))
+            {
+                err_cvv.Text = "Credit card CVV must only contain numbers and have 3-4 digits only";
+                valid = false;
+            }
+
+            return valid;
         }
 
         private void HashPassword()

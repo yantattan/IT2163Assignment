@@ -28,7 +28,9 @@
                     </asp:TableCell>
                 </asp:TableRow>
             </asp:Table>
-            <asp:Label runat="server" ID="lbl_errorMsg" Text=""></asp:Label>
+            <br />
+            <asp:Label runat="server" ID="lbl_errorMsg" Text="" ForeColor="Red"></asp:Label>
+            <br />
 
             <asp:Button runat="server" OnClick="ChangePwd" Text="Change my password" />
         </div>

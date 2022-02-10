@@ -78,6 +78,15 @@ namespace Assignment
         protected global::System.Web.UI.WebControls.TextBox tb_fname;
 
         /// <summary>
+        /// err_fname control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label err_fname;
+
+        /// <summary>
         /// lbl_lname control.
         /// </summary>
         /// <remarks>
@@ -96,6 +105,15 @@ namespace Assignment
         protected global::System.Web.UI.WebControls.TextBox tb_lname;
 
         /// <summary>
+        /// err_lname control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label err_lname;
+
+        /// <summary>
         /// lbl_email control.
         /// </summary>
         /// <remarks>
@@ -112,6 +130,15 @@ namespace Assignment
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox tb_email;
+
+        /// <summary>
+        /// err_email control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label err_email;
 
         /// <summary>
         /// lbl_dob control.
@@ -186,6 +213,15 @@ namespace Assignment
         protected global::System.Web.UI.WebControls.TextBox tb_cardNo;
 
         /// <summary>
+        /// err_cardNo control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label err_cardNo;
+
+        /// <summary>
         /// lbl_expireDate control.
         /// </summary>
         /// <remarks>
@@ -220,6 +256,15 @@ namespace Assignment
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox tb_cvv;
+
+        /// <summary>
+        /// err_cvv control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label err_cvv;
 
         /// <summary>
         /// btn_submit control.

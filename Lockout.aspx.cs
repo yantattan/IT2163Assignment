@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
@@ -12,19 +13,16 @@ namespace Assignment
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
-        }
-
-        protected void UnlockAcc(object sender, EventArgs e)
-        {
-            if (Session["Lockout"] == null)
+            if (Request.Cookies["Lockout"] != null)
             {
-                Response.Redirect("Login.aspx", true);
+                lockout_time.Text = "5000";
             }
             else
             {
-                lbl_errorMsg.Text = "Account still in lockout. Please wait before trying again.";
+                Response.Redirect("Login.aspx", false);
             }
+
         }
+
     }
 }

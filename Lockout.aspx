@@ -15,9 +15,16 @@
                 adminstrators to manage this website. Please wait till the lockout expires :)</h3>
                 <asp:Label ID="lbl_errorMsg" runat="server" ForeColor="Red"></asp:Label>
             </fieldset>
-
-            <asp:Button ID="btn_Unlock" runat="server" Text="Request for unlock" OnClick="UnlockAcc" />
+            <asp:TextBox ID="lockout_time" runat="server" Enabled="false" style="display:none;"></asp:TextBox>
         </div>
     </form>
 </body>
+<script>
+    var lockoutTime = parseInt(document.getElementById("lockout_time").value);
+    if (lockoutTime) {
+        setTimeout(function () {
+            window.location.replace("https://localhost:44308/Login.aspx");
+        }, lockoutTime)
+    }
+</script>
 </html>
