@@ -33,12 +33,12 @@ namespace Assignment
         protected global::System.Web.UI.WebControls.Label lbl_errorMsg;
 
         /// <summary>
-        /// btn_Unlock control.
+        /// lockout_time control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btn_Unlock;
+        protected global::System.Web.UI.WebControls.TextBox lockout_time;
     }
 }

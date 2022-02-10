@@ -16,7 +16,7 @@
                         <asp:Label runat="server" Text="Old password"></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="tb_oldPassword" runat="server"></asp:TextBox>
+                        <asp:TextBox ID="tb_oldPassword" runat="server" type="password"></asp:TextBox>
                     </asp:TableCell>
                 </asp:TableRow>
                 <asp:TableRow>
@@ -24,11 +24,13 @@
                         <asp:Label runat="server" Text="New password"></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="tb_newPassword" runat="server"></asp:TextBox>
+                        <asp:TextBox ID="tb_newPassword" runat="server" type="password"></asp:TextBox>
                     </asp:TableCell>
                 </asp:TableRow>
             </asp:Table>
-            <asp:Label runat="server" ID="lbl_errorMsg" Text=""></asp:Label>
+            <br />
+            <asp:Label runat="server" ID="lbl_errorMsg" Text="" ForeColor="Red"></asp:Label>
+            <br />
 
             <asp:Button runat="server" OnClick="ChangePwd" Text="Change my password" />
         </div>

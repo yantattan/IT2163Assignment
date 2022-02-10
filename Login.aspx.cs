@@ -25,7 +25,10 @@ namespace Assignment
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            if (Request.Cookies["Lockout"] != null)
+            {
+                Response.Redirect("Lockout.aspx", false);
+            }
         }
 
         protected void Login(object sender, EventArgs e)
@@ -54,93 +57,87 @@ namespace Assignment
             string dbHash = getDBHash(email);
             string dbSalt = getDBSalt(email);
 
-            if (Session["Lockout"] != null)
+            if (email.Length > 0 && password.Length > 0)
             {
-                Response.Redirect("Lockout.aspx", false);
-            }
-            else
-            {
-                if (email.Length > 0 && password.Length > 0)
+                if (Session["LoginAttempts"] == null)
                 {
-                    if (Session["LoginAttempts"] == null)
+                    Session["LoginAttempts"] = 1;
+                }
+                else
+                {
+                    int attempts = (int)Session["LoginAttempts"];
+                    attempts++;
+                    Session["LoginAttempts"] = attempts;
+                }
+                System.Diagnostics.Debug.WriteLine(Session["LoginAttempts"]);
+                // Check for email and password
+                string pwdWithSalt = password + dbSalt;
+                byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
+                string userHash = Convert.ToBase64String(hashWithSalt);
+
+                if (userHash.Equals(dbHash))
+                {
+                    SqlConnection con = new SqlConnection(MYDBConnectionString);
+                    con.Open();
+                    System.Diagnostics.Debug.WriteLine("Correctly matched");
+
+                    Session["LoggedIn"] = tb_email.Text.Trim();
+                    System.Diagnostics.Debug.WriteLine(Session["LoggedIn"]);
+
+                    // createa a new GUID and save into the session
+                    string guid = Guid.NewGuid().ToString();
+                    Session["AuthToken"] = guid;
+
+                    // now create a new cookie with this guid value
+                    Response.Cookies.Add(new HttpCookie("AuthToken", guid));
+
+                    // --- MAXIMUM PASSWORD AGE ---
+                    SqlCommand latestDateCmd = new SqlCommand("SELECT max(dateChanged) dateChanged FROM PasswordHistory WHERE email = @email;", con);
+                    latestDateCmd.Parameters.AddWithValue("email", email);
+                    SqlDataReader latestDateReader = latestDateCmd.ExecuteReader();
+                    while (latestDateReader.Read())
                     {
-                        Session["LoginAttempts"] = 1;
-                    }
-                    else
-                    {
-                        int attempts = (int)Session["LoginAttempts"];
-                        attempts++;
-                        Session["LoginAttempts"] = attempts;
-                    }
-                    System.Diagnostics.Debug.WriteLine(Session["LoginAttempts"]);
-                    // Check for email and password
-                    string pwdWithSalt = password + dbSalt;
-                    byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
-                    string userHash = Convert.ToBase64String(hashWithSalt);
-
-                    if (userHash.Equals(dbHash))
-                    {
-                        SqlConnection con = new SqlConnection(MYDBConnectionString);
-                        con.Open();
-                        System.Diagnostics.Debug.WriteLine("Correctly matched");
-
-                        Session["LoggedIn"] = tb_email.Text.Trim();
-
-                        // createa a new GUID and save into the session
-                        string guid = Guid.NewGuid().ToString();
-                        Session["AuthToken"] = guid;
-
-                        // now create a new cookie with this guid value
-                        Response.Cookies.Add(new HttpCookie("AuthToken", guid));
-
-                        // --- MAXIMUM PASSWORD AGE ---
-                        SqlCommand latestDateCmd = new SqlCommand("SELECT max(dateChanged) dateChanged FROM PasswordHistory WHERE email = @email;", con);
-                        latestDateCmd.Parameters.AddWithValue("email", email);
-                        SqlDataReader latestDateReader = latestDateCmd.ExecuteReader();
-                        while (latestDateReader.Read())
+                        if (latestDateReader["dateChanged"] != null && latestDateReader["dateChanged"] != DBNull.Value)
                         {
-                            if (latestDateReader["dateChanged"] != null && latestDateReader["dateChanged"] != DBNull.Value)
-                            {
-                                CheckMaxPasswordAge((DateTime)latestDateReader["dateChanged"]);
-                            }
-                            else
-                            {
-                                latestDateCmd = new SqlCommand("SELECT dateCreated FROM AsgnUser WHERE email = @email;", con);
-                                latestDateCmd.Parameters.AddWithValue("email", email);
-                                SqlDataReader latestDateReader2 = latestDateCmd.ExecuteReader();
-                                while (latestDateReader2.Read())
-                                {
-                                    CheckMaxPasswordAge((DateTime)latestDateReader2["dateCreated"]);
-                                }
-  
-                            }
-                        }
-
-                        SqlCommand log = new SqlCommand("INSERT INTO Log (time, email, action) VALUES (@time, @email, @action);", con);
-                        log.Parameters.AddWithValue("time", DateTime.Now);
-                        log.Parameters.AddWithValue("email", Session["LoggedIn"]);
-                        log.Parameters.AddWithValue("action", "logged into the website");
-                        using (SqlDataAdapter sda = new SqlDataAdapter())
-                        {
-                            log.ExecuteNonQuery();
-                        }
-
-                        con.Close();
-
-                        Response.Redirect("HomePage.aspx", false);
-                    }
-                    else
-                    {
-                        if ((int)Session["LoginAttempts"] <= 3)
-                        {
-                            err_msg.Text = "Wrong email or password";
+                            CheckMaxPasswordAge((DateTime)latestDateReader["dateChanged"]);
                         }
                         else
                         {
-                            Lockout();
+                            latestDateCmd = new SqlCommand("SELECT dateCreated FROM AsgnUser WHERE email = @email;", con);
+                            latestDateCmd.Parameters.AddWithValue("email", email);
+                            SqlDataReader latestDateReader2 = latestDateCmd.ExecuteReader();
+                            while (latestDateReader2.Read())
+                            {
+                                CheckMaxPasswordAge((DateTime)latestDateReader2["dateCreated"]);
+                            }
+  
                         }
-
                     }
+
+                    SqlCommand log = new SqlCommand("INSERT INTO Log (time, email, action) VALUES (@time, @email, @action);", con);
+                    log.Parameters.AddWithValue("time", DateTime.Now);
+                    log.Parameters.AddWithValue("email", Session["LoggedIn"]);
+                    log.Parameters.AddWithValue("action", "logged into the website");
+                    using (SqlDataAdapter sda = new SqlDataAdapter())
+                    {
+                        log.ExecuteNonQuery();
+                    }
+
+                    con.Close();
+
+                    Response.Redirect("HomePage.aspx", false);
+                }
+                else
+                {
+                    if ((int)Session["LoginAttempts"] <= 3)
+                    {
+                        err_msg.Text = "Wrong email or password";
+                    }
+                    else
+                    {
+                        Lockout();
+                    }
+
                 }
             }
             
@@ -280,23 +277,18 @@ namespace Assignment
 
         private void Lockout()
         {
-            Session["Lockout"] = true;
-            Response.Redirect("Lockout.aspx", false);
-            Task.Factory.StartNew(() =>
-            {
-                Thread.Sleep(10000);
-                Session["Lockout"] = null;
-            });
-            
+            Response.Cookies.Add(new HttpCookie("Lockout", "True"));
+            Response.Cookies["Lockout"].Expires = DateTime.Now.AddMinutes(0.17);
+            Session["LoginAttempts"] = null;
         }
 
         private async void CheckMaxPasswordAge(DateTime dateChanged)
         {
-            if ((DateTime.Now - dateChanged).TotalMinutes > 60d)
+            if ((DateTime.Now - dateChanged).TotalMinutes > 1d)
             {
                 err_msg.Text = "Your password has expired. Redirecting you to changing password in 3s ...";
                 await Task.Delay(TimeSpan.FromSeconds(3));
-                Response.Redirect("ChangePassword.aspx", true);
+                Response.Redirect("ChangePassword.aspx", false);
             }
         }
 

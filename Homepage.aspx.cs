@@ -13,11 +13,10 @@ namespace Assignment
         string MYDBConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["HRDBConnection"].ConnectionString;
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["Lockout"] != null)
+            if (Request.Cookies["Lockout"] != null)
             {
                 Response.Redirect("Lockout.aspx", true);
             }
-
             if (Session["LoggedIn"] != null && Session["AuthToken"] != null && Request.Cookies["AuthToken"] != null)
             {
                 if (!Session["AuthToken"].ToString().Equals(Request.Cookies["AuthToken"].Value))
@@ -71,8 +70,6 @@ namespace Assignment
             Session.Abandon();
             Session.RemoveAll();
 
-            Response.Redirect("Login.aspx", false);
-
             if (Request.Cookies["ASP.NET_SessionId"] != null)
             {
                 Response.Cookies["ASP.NET_SessionId"].Value = string.Empty;
@@ -85,6 +82,7 @@ namespace Assignment
                 Response.Cookies["AuthToken"].Expires = DateTime.Now.AddMonths(-20);
             }
 
+            Response.Redirect("Login.aspx", false);
         }
     }
 }

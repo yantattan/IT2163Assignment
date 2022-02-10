@@ -31,6 +31,8 @@
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:TextBox ID="tb_fname" runat="server"></asp:TextBox>
+                        <br />
+                        <asp:Label ID="err_fname" runat="server" Text="" ForeColor="Red"></asp:Label>
                     </asp:TableCell>
                 </asp:TableRow>
 
@@ -40,6 +42,8 @@
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:TextBox ID="tb_lname" runat="server"></asp:TextBox>
+                        <br />
+                        <asp:Label ID="err_lname" runat="server" Text="" ForeColor="Red"></asp:Label>
                     </asp:TableCell>
                 </asp:TableRow>
 
@@ -49,6 +53,8 @@
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:TextBox ID="tb_email" runat="server"></asp:TextBox>
+                        <br />
+                        <asp:Label ID="err_email" runat="server" Text="" ForeColor="Red"></asp:Label>
                     </asp:TableCell>
                 </asp:TableRow>
 
@@ -85,6 +91,8 @@
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:TextBox ID="tb_cardNo" runat="server"></asp:TextBox>
+                        <br />
+                        <asp:Label ID="err_cardNo" runat="server" Text="" ForeColor="Red"></asp:Label>
                     </asp:TableCell>
                 </asp:TableRow>
                 <asp:TableRow>
@@ -101,6 +109,8 @@
                     </asp:TableCell>
                     <asp:TableCell>
                         <asp:TextBox ID="tb_cvv" runat="server"></asp:TextBox>
+                        <br />
+                        <asp:Label ID="err_cvv" runat="server" Text="" ForeColor="Red"></asp:Label>
                     </asp:TableCell>
                 </asp:TableRow>
 
@@ -119,8 +129,8 @@
             lbl_passwordRequirement.innerHTML = "";
             var msg = ""
 
-            if (str.length < 8) {
-                msg += "Password length must be at least 8 characters";
+            if (str.length < 12) {
+                msg += "Password length must be at least 12 characters";
             }
             if (str.search(/[0-9]/) == -1) {
                 msg += ", require at least 1 number";
