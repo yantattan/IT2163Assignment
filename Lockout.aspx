@@ -11,7 +11,7 @@
         <div>
             <fieldset>
                 <legend>:(</legend>
-                <h3>Your account has been temporarily locked for 2 mins due to multiple invalid login attempts. We have no 
+                <h3>Your account has been temporarily locked for 1 mins due to multiple invalid login attempts. We have no 
                 adminstrators to manage this website. Please wait till the lockout expires :)</h3>
                 <asp:Label ID="lbl_errorMsg" runat="server" ForeColor="Red"></asp:Label>
             </fieldset>

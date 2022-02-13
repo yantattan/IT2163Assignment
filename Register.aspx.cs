@@ -138,7 +138,7 @@ namespace Assignment
                 valid = false;
             }   
 
-            if (!Regex.IsMatch(creditCVV, "[0-9]{3, 4}$"))
+            if (!Regex.IsMatch(creditCVV, "[0-9]{3,4}$"))
             {
                 err_cvv.Text = "Credit card CVV must only contain numbers and have 3-4 digits only";
                 valid = false;

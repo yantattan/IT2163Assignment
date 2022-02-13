@@ -30,7 +30,7 @@
                         <asp:Label ID="lbl_fname" runat="server" Text="First Name"></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="tb_fname" runat="server"></asp:TextBox>
+                        <asp:TextBox ID="tb_fname" runat="server" onkeyup="javascript:CheckFName()"></asp:TextBox>
                         <br />
                         <asp:Label ID="err_fname" runat="server" Text="" ForeColor="Red"></asp:Label>
                     </asp:TableCell>
@@ -41,7 +41,7 @@
                         <asp:Label ID="lbl_lname" runat="server" Text="Last Name"></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="tb_lname" runat="server"></asp:TextBox>
+                        <asp:TextBox ID="tb_lname" runat="server" onkeyup="javascript:CheckLName()"></asp:TextBox>
                         <br />
                         <asp:Label ID="err_lname" runat="server" Text="" ForeColor="Red"></asp:Label>
                     </asp:TableCell>
@@ -52,7 +52,7 @@
                         <asp:Label ID="lbl_email" runat="server" Text="Email"></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="tb_email" runat="server"></asp:TextBox>
+                        <asp:TextBox ID="tb_email" runat="server" onkeyup="javascript:CheckEmail()"></asp:TextBox>
                         <br />
                         <asp:Label ID="err_email" runat="server" Text="" ForeColor="Red"></asp:Label>
                     </asp:TableCell>
@@ -108,7 +108,7 @@
                         <asp:Label ID="lbl_cvv" runat="server" Text="CVV"></asp:Label>
                     </asp:TableCell>
                     <asp:TableCell>
-                        <asp:TextBox ID="tb_cvv" runat="server"></asp:TextBox>
+                        <asp:TextBox ID="tb_cvv" runat="server" onkeyup="javascript:CheckCVV()"></asp:TextBox>
                         <br />
                         <asp:Label ID="err_cvv" runat="server" Text="" ForeColor="Red"></asp:Label>
                     </asp:TableCell>
@@ -127,7 +127,7 @@
             var str = document.getElementById("<%=tb_password.ClientID %>").value;
             var lbl_passwordRequirement = document.getElementById("lbl_passwordRequirement")
             lbl_passwordRequirement.innerHTML = "";
-            var msg = ""
+            var msg = "";
 
             if (str.length < 12) {
                 msg += "Password length must be at least 12 characters";
@@ -146,6 +146,58 @@
             }
 
             lbl_passwordRequirement.innerHTML = msg;
+        }
+
+        function CheckFName() {
+            var str = document.getElementById("<%=tb_fname.ClientID %>").value;
+            var err_fname = document.getElementById("<%=err_fname.ClientID %>");
+            err_fname.innerHTML = "";
+            var msg = "";
+
+            if (str.search(/[a-zA-Z0-9]{1,}$/) == -1) {
+                msg = "First name must not contain special characters";
+            }
+
+            err_fname.innerHTML = msg;
+        }
+
+        function CheckLName() {
+            var str = document.getElementById("<%=tb_lname.ClientID %>").value;
+            var err_lname = document.getElementById("<%=err_lname.ClientID %>");
+            err_lname.innerHTML = "";
+            var msg = "";
+
+            if (str.search(/[a-zA-Z0-9]{1,}$/) == -1) {
+                msg = "Last name must not contain special characters";
+            }
+
+            err_lname.innerHTML = msg;
+        }
+
+        function CheckEmail() {
+            var str = document.getElementById("<%=tb_email.ClientID %>").value;
+            var err_email = document.getElementById("<%=err_email.ClientID %>");
+            err_email.innerHTML = "";
+            var msg = "";
+
+            if (str.search(/^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$/) == -1) {
+                msg = "Email must be in the correct format";
+            }
+
+            err_email.innerHTML = msg;
+        }
+
+        function CheckCVV() {
+            var str = document.getElementById("<%=tb_cvv.ClientID %>").value;
+            var err_cvv = document.getElementById("<%=err_cvv.ClientID %>");
+            err_cvv.innerHTML = "";
+            var msg = "";
+
+            if (str.search(/[0-9]{3,4}$/) == -1) {
+                msg = "Credit card CVV must only contain numbers and have 3-4 digits only";
+            }
+
+            err_cvv.innerHTML = msg;
         }
     </script>
 </body> 
