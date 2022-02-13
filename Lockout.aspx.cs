@@ -15,7 +15,7 @@ namespace Assignment
         {
             if (Request.Cookies["Lockout"] != null)
             {
-                lockout_time.Text = "5000";
+                lockout_time.Text = "60000";
             }
             else
             {

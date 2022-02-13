@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -36,7 +37,7 @@ namespace Assignment
             if (ValidateCaptcha())
             {
                 InputXSSValidation();
-                AddSession();
+                CheckCredentials();
             }
             else
             {
@@ -51,7 +52,7 @@ namespace Assignment
             password = HttpUtility.HtmlEncode(tb_password.Text.ToString().Trim());
         }
 
-        private void AddSession()
+        private void CheckCredentials()
         {
             SHA512Managed hashing = new SHA512Managed();
             string dbHash = getDBHash(email);
@@ -70,6 +71,7 @@ namespace Assignment
                     Session["LoginAttempts"] = attempts;
                 }
                 System.Diagnostics.Debug.WriteLine(Session["LoginAttempts"]);
+
                 // Check for email and password
                 string pwdWithSalt = password + dbSalt;
                 byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
@@ -81,55 +83,11 @@ namespace Assignment
                     con.Open();
                     System.Diagnostics.Debug.WriteLine("Correctly matched");
 
-                    Session["LoggedIn"] = tb_email.Text.Trim();
-                    System.Diagnostics.Debug.WriteLine(Session["LoggedIn"]);
-
-                    // createa a new GUID and save into the session
-                    string guid = Guid.NewGuid().ToString();
-                    Session["AuthToken"] = guid;
-
-                    // now create a new cookie with this guid value
-                    Response.Cookies.Add(new HttpCookie("AuthToken", guid));
-
-                    // --- MAXIMUM PASSWORD AGE ---
-                    SqlCommand latestDateCmd = new SqlCommand("SELECT max(dateChanged) dateChanged FROM PasswordHistory WHERE email = @email;", con);
-                    latestDateCmd.Parameters.AddWithValue("email", email);
-                    SqlDataReader latestDateReader = latestDateCmd.ExecuteReader();
-                    while (latestDateReader.Read())
-                    {
-                        if (latestDateReader["dateChanged"] != null && latestDateReader["dateChanged"] != DBNull.Value)
-                        {
-                            CheckMaxPasswordAge((DateTime)latestDateReader["dateChanged"]);
-                        }
-                        else
-                        {
-                            latestDateCmd = new SqlCommand("SELECT dateCreated FROM AsgnUser WHERE email = @email;", con);
-                            latestDateCmd.Parameters.AddWithValue("email", email);
-                            SqlDataReader latestDateReader2 = latestDateCmd.ExecuteReader();
-                            while (latestDateReader2.Read())
-                            {
-                                CheckMaxPasswordAge((DateTime)latestDateReader2["dateCreated"]);
-                            }
-  
-                        }
-                    }
-
-                    SqlCommand log = new SqlCommand("INSERT INTO Log (time, email, action) VALUES (@time, @email, @action);", con);
-                    log.Parameters.AddWithValue("time", DateTime.Now);
-                    log.Parameters.AddWithValue("email", Session["LoggedIn"]);
-                    log.Parameters.AddWithValue("action", "logged into the website");
-                    using (SqlDataAdapter sda = new SqlDataAdapter())
-                    {
-                        log.ExecuteNonQuery();
-                    }
-
-                    con.Close();
-
-                    Response.Redirect("HomePage.aspx", false);
+                    Response.Redirect("2FAVerify.aspx?c="+HttpUtility.UrlEncode(email), false);
                 }
                 else
                 {
-                    if ((int)Session["LoginAttempts"] <= 3)
+                    if ((int)Session["LoginAttempts"] < 3)
                     {
                         err_msg.Text = "Wrong email or password";
                     }
@@ -208,35 +166,6 @@ namespace Assignment
             return s;
         }
 
-        private void HashPassword()
-        {
-            string passwordSalt;
-            string passwordFinalHash;
-            byte[] Key;
-            byte[] IV;
-
-            //Generate random salt
-            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-            byte[] saltByte = new byte[8];
-
-            //Fills array of bytes with a cryptographically strong sequence of random values.
-            rng.GetBytes(saltByte);
-            passwordSalt = Convert.ToBase64String(saltByte);
-
-            SHA512Managed hashing = new SHA512Managed();
-
-            string pwdWithSalt = password + passwordSalt;
-            byte[] plainHash = hashing.ComputeHash(Encoding.UTF8.GetBytes(password));
-            byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
-            passwordFinalHash = Convert.ToBase64String(hashWithSalt);
-
-            RijndaelManaged cipher = new RijndaelManaged();
-            cipher.GenerateKey();
-            Key = cipher.Key;
-            IV = cipher.IV;
-
-        }
-
         public bool ValidateCaptcha()
         {
             bool result = true;
@@ -278,18 +207,8 @@ namespace Assignment
         private void Lockout()
         {
             Response.Cookies.Add(new HttpCookie("Lockout", "True"));
-            Response.Cookies["Lockout"].Expires = DateTime.Now.AddMinutes(0.17);
+            Response.Cookies["Lockout"].Expires = DateTime.Now.AddMinutes(1);
             Session["LoginAttempts"] = null;
-        }
-
-        private async void CheckMaxPasswordAge(DateTime dateChanged)
-        {
-            if ((DateTime.Now - dateChanged).TotalMinutes > 1d)
-            {
-                err_msg.Text = "Your password has expired. Redirecting you to changing password in 3s ...";
-                await Task.Delay(TimeSpan.FromSeconds(3));
-                Response.Redirect("ChangePassword.aspx", false);
-            }
         }
 
     }

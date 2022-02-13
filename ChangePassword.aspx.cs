@@ -27,7 +27,22 @@ namespace Assignment
         byte[] IV;
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Request.Cookies["Lockout"] != null)
+            {
+                Response.Redirect("Lockout.aspx", true);
+            }
 
+            if (Session["LoggedIn"] != null && Session["AuthToken"] != null && Request.Cookies["AuthToken"] != null)
+            {
+                if (!Session["AuthToken"].ToString().Equals(Request.Cookies["AuthToken"].Value))
+                {
+                    Response.Redirect("Login.aspx", false);
+                }
+            }
+            else
+            {
+                Response.Redirect("Login.aspx", false);
+            }
         }
 
         protected void ChangePwd(object sender, EventArgs e)
@@ -71,7 +86,7 @@ namespace Assignment
                             {
                                 // Check for min password age
                                 if (latestDateReader["dateChanged"] == null || latestDateReader["dateChanged"] == DBNull.Value ||
-                                    (DateTime.Now - (DateTime)latestDateReader["dateChanged"]).TotalMinutes > 0.5d)
+                                    (DateTime.Now - (DateTime)latestDateReader["dateChanged"]).TotalMinutes > 1d)
                                 {
                                     // Check if user reused the same password as before
                                     if (!newInputHash.Equals(oldDBHash))
@@ -120,32 +135,31 @@ namespace Assignment
             SqlConnection con = new SqlConnection(MYDBConnectionString);
             con.Open();
 
-            SqlCommand findReusedPasswordsCmd = new SqlCommand("SELECT id FROM PasswordHistory WHERE email = @email AND password = @newPassword;", con);
+            SqlCommand findReusedPasswordsCmd = new SqlCommand("SELECT count(*) count FROM PasswordHistory WHERE email = @email AND (password = @newPassword OR password = @newPassword2);", con);
+            string previousDBSalt1 = getDBSaltOld((string)Session["LoggedIn"], 1);
+            string previousDBSalt2 = getDBSaltOld((string)Session["LoggedIn"], 2);
+            string[] pwdWithOldSalts = HashWithOldSalts(previousDBSalt1, previousDBSalt2);
+
             findReusedPasswordsCmd.Parameters.AddWithValue("email", Session["LoggedIn"]);
-            findReusedPasswordsCmd.Parameters.AddWithValue("newPassword", newPasswordFinalHash);
+            findReusedPasswordsCmd.Parameters.AddWithValue("newPassword", pwdWithOldSalts[0]);
+            findReusedPasswordsCmd.Parameters.AddWithValue("newPassword2", pwdWithOldSalts[1]);
+
+
             using (SqlDataReader findReusedPasswordsReader = findReusedPasswordsCmd.ExecuteReader())
             {
-                if (findReusedPasswordsReader.Read())
+                while (findReusedPasswordsReader.Read())
                 {
-                    while (findReusedPasswordsReader.Read())
+                    System.Diagnostics.Debug.WriteLine("Here");
+                    if ((int)findReusedPasswordsReader["count"] == 0)
                     {
-                        System.Diagnostics.Debug.WriteLine("Here");
-                        if (findReusedPasswordsReader["id"] == null || findReusedPasswordsReader["id"] == DBNull.Value)
-                        {
-                            UpdatePassword();
-                            System.Diagnostics.Debug.WriteLine("Update password");
-                        }
-                        else
-                        {
-                            lbl_errorMsg.Text = "You are not allowed to reuse 2 of the latest passwords that you used previously";
-                        }
+                        UpdatePassword();
+                        System.Diagnostics.Debug.WriteLine("Update password");
+                    }
+                    else
+                    {
+                        lbl_errorMsg.Text = "You are not allowed to reuse 2 of the latest passwords that you used previously";
                     }
                 }
-                else
-                {
-                    UpdatePassword();
-                }
-
             }
 
             con.Close();
@@ -217,6 +231,45 @@ namespace Assignment
             return s;
         }
 
+        protected string getDBSaltOld(string email, int index)
+        {
+            string s = null;
+            SqlConnection con = new SqlConnection(MYDBConnectionString);
+            SqlCommand command = new SqlCommand("SELECT passwordSalt FROM PasswordHistory WHERE email = @email", con);
+            command.Parameters.AddWithValue("email", email);
+
+            try
+            {
+                int count = 1;
+                con.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (count != index)
+                        {
+                            count++;
+                            continue;
+                        }
+                        if (reader["passwordSalt"] != null)
+                        {
+                            if (reader["passwordSalt"] != DBNull.Value)
+                            {
+                                s = reader["passwordSalt"].ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+            }
+            finally { con.Close(); }
+            System.Diagnostics.Debug.WriteLine(s);
+            return s;
+        }
+
         private void HashPassword()
         {
 
@@ -251,9 +304,24 @@ namespace Assignment
             IV = cipher.IV;
         }
 
+        private string[] HashWithOldSalts(string salt1, string salt2)
+        {
+            List<string> result = new List<string>();
+            SHA512Managed hashing = new SHA512Managed();
+
+            string hashWithDBSalt1 = newPassword + salt1;
+            byte[] hashWithSaltOld = hashing.ComputeHash(Encoding.UTF8.GetBytes(hashWithDBSalt1));
+            result.Add(Convert.ToBase64String(hashWithSaltOld));
+
+            string hashWithDBSalt2 = newPassword + salt2;
+            hashWithSaltOld = hashing.ComputeHash(Encoding.UTF8.GetBytes(hashWithDBSalt2));
+            result.Add(Convert.ToBase64String(hashWithSaltOld));
+
+            return result.ToArray();
+        }
+
         private void UpdatePassword()
         {
-            System.Diagnostics.Debug.WriteLine("Here yey3");
             SqlConnection con = new SqlConnection(MYDBConnectionString);
             con.Open();
 

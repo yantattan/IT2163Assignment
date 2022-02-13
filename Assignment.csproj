@@ -108,6 +108,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="2FAVerify.aspx" />
     <Content Include="ChangePassword.aspx" />
     <Content Include="Homepage.aspx" />
     <Content Include="Lockout.aspx" />
@@ -116,6 +117,13 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="2FAVerify.aspx.cs">
+      <DependentUpon>2FAVerify.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="2FAVerify.aspx.designer.cs">
+      <DependentUpon>2FAVerify.aspx</DependentUpon>
+    </Compile>
     <Compile Include="ChangePassword.aspx.cs">
       <DependentUpon>ChangePassword.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
