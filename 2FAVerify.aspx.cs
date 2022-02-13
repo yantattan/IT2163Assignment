@@ -138,30 +138,41 @@ namespace Assignment
             Session["Generated2FAOTP"] = twoFACode;
 
             // Mailing Service
-            string[] creds = { "tytit2163assignment@gmail.com", "P@ssw0rdit2163" };
-            MailMessage mail = new MailMessage();
-            mail.To.Add(email);
-            mail.From = new MailAddress(creds[0], "SITConnect Online Stationary Store", Encoding.UTF8);
-            mail.Subject = "2FA Code for logging in";
-            mail.SubjectEncoding = Encoding.UTF8;
-            mail.Body = $"Your verification code:<br/> <h3>{twoFACode}<h3>";
-            mail.BodyEncoding = Encoding.UTF8;
-            mail.IsBodyHtml = true;
+            SqlConnection con = new SqlConnection(MYDBConnectionString);
+            con.Open();
+            SqlCommand getMailServiceCreds = new SqlCommand("SELECT * FROM MailServiceCredentials", con);
+            
+            using (SqlDataReader getMailServiceCredsReader = getMailServiceCreds.ExecuteReader()) 
+            {
+                while (getMailServiceCredsReader.Read())
+                {
+                    MailMessage mail = new MailMessage();
+                    mail.To.Add(email);
+                    mail.From = new MailAddress((string)getMailServiceCredsReader["mailEmail"], "SITConnect Online Stationary Store", Encoding.UTF8);
+                    mail.Subject = "2FA Code for logging in";
+                    mail.SubjectEncoding = Encoding.UTF8;
+                    mail.Body = $"Your verification code:<br/> <h3>{twoFACode}<h3>";
+                    mail.BodyEncoding = Encoding.UTF8;
+                    mail.IsBodyHtml = true;
 
-            SmtpClient client = new SmtpClient();
-            client.Credentials = new NetworkCredential(creds[0], creds[1]);
-            client.Port = 587;
-            client.Host = "smtp.gmail.com";
-            client.EnableSsl = true;
-            try
-            {
-                client.Send(mail);
-                System.Diagnostics.Debug.WriteLine("Mail sent");
+                    SmtpClient client = new SmtpClient();
+                    client.Credentials = new NetworkCredential((string)getMailServiceCredsReader["mailEmail"], (string)getMailServiceCredsReader["mailPassword"]);
+                    client.Port = 587;
+                    client.Host = "smtp.gmail.com";
+                    client.EnableSsl = true;
+                    try
+                    {
+                        client.Send(mail);
+                        System.Diagnostics.Debug.WriteLine("Mail sent");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine(ex);
+                    }
+                }
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex);
-            }
+            
+            con.Close();
         }
 
         private void InputXSSValidation()
