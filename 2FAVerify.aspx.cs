@@ -138,9 +138,10 @@ namespace Assignment
             Session["Generated2FAOTP"] = twoFACode;
 
             // Mailing Service
+            string[] creds = { "tytit2163assignment@gmail.com", "P@ssw0rdit2163" };
             MailMessage mail = new MailMessage();
             mail.To.Add(email);
-            mail.From = new MailAddress("tytit2163assignment@gmail.com", "SITConnect Online Stationary Store", Encoding.UTF8);
+            mail.From = new MailAddress(creds[0], "SITConnect Online Stationary Store", Encoding.UTF8);
             mail.Subject = "2FA Code for logging in";
             mail.SubjectEncoding = Encoding.UTF8;
             mail.Body = $"Your verification code:<br/> <h3>{twoFACode}<h3>";
@@ -148,7 +149,7 @@ namespace Assignment
             mail.IsBodyHtml = true;
 
             SmtpClient client = new SmtpClient();
-            client.Credentials = new NetworkCredential("tytit2163assignment@gmail.com", "P@ssw0rdit2163");
+            client.Credentials = new NetworkCredential(creds[0], creds[1]);
             client.Port = 587;
             client.Host = "smtp.gmail.com";
             client.EnableSsl = true;
